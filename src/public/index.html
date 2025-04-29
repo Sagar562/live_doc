@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Live Docs Clone</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Live Document Editor 📝</h1>
+    <textarea id="editor" placeholder="Start typing..." autofocus></textarea>
+    <div class="buttons">
+      <button id="saveBtn">Save</button>
+      <button id="showDocs">Show Documents</button>
+      <button id="createDocBtn">
+        <a href="">create Document</a>
+      </button>
+      <!-- <button id="loadBtn">Load</button> -->
+    </div>
+  </div>
+
+  <!-- jQuery -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <!-- Socket.IO Client -->
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+  <!-- Your main script -->
+  <script src="script.js"></script>
+  <script src="./ajax/documentAjax.js"></script>
+</body>
+</html>
