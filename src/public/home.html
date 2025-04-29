@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MyDocs - Home</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f1f3f4;
+    }
+
+    header {
+      background-color: #fff;
+      padding: 20px 40px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 40px auto;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: flex-start;
+    }
+
+    .card {
+      width: 180px;
+      height: 220px;
+      background-color: white;
+      border: 2px dashed #c2c2c2;
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .card:hover {
+      border-color: #007bff;
+      box-shadow: 0 4px 8px rgba(0, 123, 255, 0.2);
+    }
+
+    .plus-icon {
+      font-size: 4rem;
+      color: #007bff;
+    }
+
+    .label {
+      margin-top: 10px;
+      font-size: 1rem;
+      color: #555;
+    }
+
+    .docs-list {
+      margin-top: 40px;
+      width: 100%;
+    }
+
+    .docs-list h2 {
+      font-size: 1.4rem;
+      color: #333;
+    }
+
+    .doc-card {
+      display: flex;
+      justify-content: space-between;
+      background-color: white;
+      padding: 15px;
+      margin-bottom: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .doc-card:hover {
+      background-color: #f0f0f0;
+    }
+
+    .doc-title {
+      font-size: 1.1rem;
+      color: #333;
+    }
+
+    .doc-action {
+      color: #007bff;
+      cursor: pointer;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <header>MyDocs</header>
+
+  <div class="container">
+    <!-- New Document Card -->
+    <div class="card" id="createDocBtn">
+      <div class="plus-icon">+</div>
+      <div class="label">New Document</div>
+    </div>
+  </div>
+
+  <!-- Previous Documents Section -->
+  <div class="docs-list">
+    <h2>Previous Documents</h2>
+    <div id="documentsContainer"></div>
+  </div>
+
+  <!-- jQuery CDN -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+  <script>
+    $(document).ready(function() {
+
+      // Fetch previously created documents
+      $.ajax({
+        type: 'GET',
+        url: '/api/document/allDocuments', // API for fetching all previous documents
+        success: function(response) {
+          if (response.success && response.documents.length > 0) {
+            const docsContainer = $('#documentsContainer');
+            response.documents.forEach(function(doc) {
+              const docCard = `
+                <div class="doc-card">
+                  <div class="doc-title">${doc.title}</div>
+                  <div class="doc-action" onclick="window.location.href='index.html?id=${doc.docId}'">Open</div>
+                </div>
+              `;
+              docsContainer.append(docCard);
+            });
+          } else {
+            $('#documentsContainer').html('<p>No documents found.</p>');
+          }
+        },
+        error: function() {
+          alert('Failed to load documents.');
+        }
+      });
+
+      // New Document button click handler
+      $('#createDocBtn').click(function() {
+        $.ajax({
+          type: 'POST',
+          url: '/api/document/create',
+          success: function(response) {
+            if (response.document && response.document.docId) {
+              const newDocId = response.document.docId;
+              window.location.href = `index.html?id=${newDocId}`; // Redirect to the new document editor page
+            } else {
+              alert('Error: Document not created properly');
+            }
+          },
+          error: function() {
+            alert('Failed to create a new document.');
+          }
+        });
+      });
+
+    });
+  </script>
+
+</body>
+</html>

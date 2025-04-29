@@ -20,8 +20,10 @@ export const createDocument = async(req: CustomRequest, res: Response) => {
             res.cookie('cookieId', cookieId, {
                 maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
                 httpOnly: true,
-                secure: true,
-                sameSite: 'strict',
+                secure: false,
+                sameSite: 'lax',
+                // secure: true,
+                // sameSite: 'strict',
             });
         }
         else
@@ -39,6 +41,7 @@ export const createDocument = async(req: CustomRequest, res: Response) => {
         }
         const newDoc = await Document.create({
             userId: user.id,
+            title: 'untitled',
             content: '',
         });
 
@@ -62,9 +65,9 @@ export const createDocument = async(req: CustomRequest, res: Response) => {
 export const saveDocument = async(req: Request, res: Response) => {
     try {
         console.log(req.body);
-        const {docId, content} = req.body;
+        const {docId, title, content} = req.body;
 
-        if (!docId || !content)
+        if (!docId || !title || !content)
         {
             res.status(400).json({
                 success: false,
@@ -88,6 +91,7 @@ export const saveDocument = async(req: Request, res: Response) => {
             return;
         }
 
+        document.title = title && title.trim() !== '' ? title : document.title;
         document.content = content || document.content;
         await document.save();
         
@@ -125,8 +129,9 @@ export const getAllDocuments = async (req: CustomRequest, res: Response) => {
         // get all documents of user
         const allDocuments = await Document.findAll({
             where: {
-                userId: user?.id,
+                userId: user.id,
             },
+            order: [['createdAt', 'DESC']],
         });
 
         if (!allDocuments)
@@ -150,6 +155,55 @@ export const getAllDocuments = async (req: CustomRequest, res: Response) => {
             success: false,
             message: 'Internal server error',
             error: error
+        });
+    }
+};
+
+// load the document
+export const loadDocument = async (req: Request, res: Response) => {
+  
+    try {
+        // get the param id
+        const {id} = req.params;
+        
+        if (!id)
+        {
+            res.status(401).json({
+                success:false,
+                message: 'Document id is required',
+            });
+            return;
+        }
+
+        // check id is present in db
+        const checkId = await Document.findOne({
+            where: {
+                docId: id,
+            },
+        });
+
+        if (!checkId)
+        {
+            res.status(404).json({
+                success: false,
+                message: 'Given document id is not found',
+            });
+            return;
+        }
+
+        res.status(200).json({
+            document: checkId,
+            success: true,
+            message: 'Document load successfully',
+        });
+
+
+    } catch(error) {
+        console.log(error);
+        res.status(500).json({
+            success: false,
+            message: 'Internal server error',
+            error: error,
         });
     }
 };

@@ -26,6 +26,11 @@ export const Document = sequelize.define<docInstance>("Document",{
         allowNull: false,
         // unique: true,
     },
+    title: {
+        type: DataTypes.STRING,
+        defaultValue: 'Untitled Document',
+        allowNull: false,
+    },
     content: {
         type: DataTypes.TEXT,
         allowNull:  true,

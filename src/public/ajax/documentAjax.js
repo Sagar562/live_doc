@@ -6,6 +6,7 @@ $(document).ready(function() {
         const urlParams = new URLSearchParams(window.location.search);
         const docId = urlParams.get('id'); // Get docId from the query parameter
         
+        const title = $('#titleId').val();
         const content = $('#editor').val();  
      
         if (!docId)
@@ -21,6 +22,7 @@ $(document).ready(function() {
             contentType: 'application/json',  // Set the Content-Type to application/json
             data: JSON.stringify({
                 docId: docId,
+                title: title,
                 content: content,
             }),
             success: function(response) {
@@ -55,4 +57,25 @@ $(document).ready(function() {
         });
     });
 
-})
+    // load the content
+    const docId = new URLSearchParams(window.location.search).get('id');
+    if (docId) {
+        $.ajax({
+            type: 'GET',
+            url: `/api/document/${docId}`,
+            success: function(response) {
+                if (response.success) {
+                    $('#titleId').val(response.document.title);
+                    $('#editor').val(response.document.content); // Populate the editor
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function(err) {
+                console.error(err);
+                // alert('Failed to load the document');
+                window.location.href = 'not-found.html';
+            }
+        });
+    }
+})  

@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { createDocument, saveDocument, getAllDocuments } from "../controllers/documentController";
+import { createDocument, saveDocument, getAllDocuments, loadDocument } from "../controllers/documentController";
 
 const route = Router();
 
@@ -7,5 +7,6 @@ const route = Router();
 route.post('/create', createDocument);
 route.post('/save-document', saveDocument);
 route.get('/allDocuments', getAllDocuments);
+route.get('/:id', loadDocument);
  
 export default route;
